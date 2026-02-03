@@ -21,16 +21,19 @@
 ###        slug_secret="password", # Optional, this shows default
 ###        )
 ###    print(f"id: {cred.secret_id} ident: {cred.ident} secret: {cred.secret}")
-###    ``` 
+###    ```
 ###
 
 
-import os, typing
-from uuid import uuid4
-from functools import cached_property
-from dotenv import load_dotenv; load_dotenv()
+import os
+import typing
 import httpx
+from uuid import uuid4
 from pydantic import BaseModel, Field, ConfigDict
+from functools import cached_property
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 SSAPP_USERNAME = os.getenv("SSAPP_USERNAME")
@@ -38,9 +41,9 @@ SSAPP_PASSWORD = os.getenv("SSAPP_PASSWORD")
 
 SSAPP_BASEURL = os.getenv("SSAPP_BASEURL")
 
-SEC_NAME_AS_IDENT= [
-    6041, # IAM - Service Account
-    6047, # IAM - High Risk Service Account
+SEC_NAME_AS_IDENT = [
+    6041,  # IAM - Service Account
+    6047,  # IAM - High Risk Service Account
 ]
 
 current_access_token: str | None = None
@@ -72,7 +75,7 @@ class SSCreds(BaseModel):
     model_config = ConfigDict(
         arbitrary_types_allowed=True,  # Allow arbitrary types in the model
     )
-    
+
     @cached_property
     def ident(self) -> str:
         """Returns value of credential username/identity"""
@@ -177,7 +180,6 @@ class SSCreds(BaseModel):
             resp.raise_for_status()
             return resp.text.strip('"')
         except Exception as e:
-
             raise e
 
     def _getSecretSummary(self) -> dict:
@@ -194,7 +196,6 @@ class SSCreds(BaseModel):
         refresh_ctr: str | None = None
 
     def _getServerAccessToken(self) -> str:
-
         # Get new oauth token from server with creds
         cred = (SSAPP_USERNAME, SSAPP_PASSWORD)
         resp = self._s.post(  # pyright: ignore[reportOptionalMemberAccess]
@@ -214,7 +215,6 @@ class SSCreds(BaseModel):
         oauth.token_type = resp["token_type"]
         oauth.expires_in = resp["expires_in"]
         oauth.refresh_token = resp["refresh_token"]
-        
 
         # Save tokens to cache
         current_access_token = oauth.access_token
@@ -228,7 +228,6 @@ class SSCreds(BaseModel):
         data: dict = {},
         params: dict = {},
     ) -> httpx.Response:
-
         resp = self._s.post(  # pyright: ignore[reportOptionalMemberAccess]
             headers=self._getHeaders,  # pyright: ignore[reportArgumentType]
             url=SSAPP_BASEURL + url,  # pyright: ignore[reportOptionalOperand]
@@ -243,7 +242,6 @@ class SSCreds(BaseModel):
         url: str,
         params: dict = {},
     ) -> httpx.Response:
-
         def sendRequest():
             if self._s is None:
                 self._initSession()
@@ -252,15 +250,9 @@ class SSCreds(BaseModel):
                 url=SSAPP_BASEURL + url,  # pyright: ignore[reportOptionalOperand]
                 params=params,
             )
-            try:
-                resp.raise_for_status()
-            except:
-                # Set resolution_msg
-                if "API_AccessDenied" in resp.text:
-                    resolution_msg = "Confirm correct Secret ID"
-                    raise RuntimeError(
-                        f"Delinea GET request returned error HTTP Code: {resp.status_code} {resp.json()["message"]}"
-                    )
+            resp.raise_for_status()
+            if "API_AccessDenied" in resp.text:
+                raise RuntimeError("Unable to retrieve secret, access denied.")
             return resp
 
         resp = sendRequest()
@@ -269,12 +261,7 @@ class SSCreds(BaseModel):
             current_access_token = None
             current_refresh_token = None
             resp = sendRequest()
-            try:
-                resp.raise_for_status()
-            
-            except:
-                raise RuntimeError(
-                    f"Delinea GET request returned error HTTP Code: {resp.status_code} {resp.json()["message"]}"
-                    )
+            resp.raise_for_status()
+
 
         return resp
