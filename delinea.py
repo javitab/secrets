@@ -225,7 +225,6 @@ class SSCreds(BaseModel):
                 headers=self._getHeaders,
                 url=SSAPP_BASEURL + url,  # pyright: ignore[reportOptionalOperand]
                 params=params,
-                data=data,  # pyright: ignore[reportCallIssue]
             )
             try:
                 resp.raise_for_status()
