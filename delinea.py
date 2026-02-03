@@ -1,3 +1,30 @@
+###
+### Delinea (SSApp) Secrets Retrieval Module
+### Developed by John Avitable 02 February 2026
+### Below module requires environment variables:
+###     SSAPP_USERNAME
+###     SSAPP_PASSWORD
+###     SSAPP_BASEURL
+###
+### And also requires the following libraries:
+###     httpx
+###     pydantic
+###     python-dotenv
+###
+### Usage Example:
+###     ```python
+###     from delinea import SSCreds
+###
+###    cred = SSCreds(
+###        secret_id=1234,
+###        slug_ident="username", # Optional, this shows default
+###        slug_secret="password", # Optional, this shows default
+###        )
+###    print(f"id: {cred.secret_id} ident: {cred.ident} secret: {cred.secret}")
+###    ``` 
+###
+
+
 import os, typing
 from uuid import uuid4
 from functools import cached_property
@@ -214,7 +241,6 @@ class SSCreds(BaseModel):
     def get(
         self,
         url: str,
-        data: dict = {},
         params: dict = {},
     ) -> httpx.Response:
 
