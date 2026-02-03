@@ -6,6 +6,11 @@ A Python client library for retrieving credentials from Delinea Secret Server.
 
 This project provides a simple interface to interact with the Delinea Secret Server API, allowing you to retrieve secrets, credentials, and TOTP codes programmatically.
 
+#### Delinea Swagger Documentation
+Additional information about other APIs not used in this module can be found at:
+   - [Full Rest API Docs](https://thycapp.ynhh.org/SecretServer/RestApiDocs.ashx?doc=token-help)
+   - [OAuth API Docs](https://thycapp.ynhh.org/SecretServer/RestApiDocs.ashx?doc=oauth-help)
+
 ## Requirements
 
 - Python >= 3.10
@@ -126,8 +131,10 @@ uv run python script.py
 
 ## License
 
-Add your license information here.
+No specific license has been applied for this repository. It can be used internally and shared with others without restriction.
 
 ## Author
 
-Add your contact information here.
+John Avitable
+Created 03 February 2026
+YNHHS Automation Architect
