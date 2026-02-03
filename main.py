@@ -1,4 +1,4 @@
-from secrets import SSCreds
+from delinea import SSCreds
 
 if __name__ == "__main__":
     cred = SSCreds(secret_id=int(input("Enter secret_id to retrieve: ")))
