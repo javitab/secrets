@@ -89,6 +89,8 @@ class SSCreds(BaseModel):
     def model_post_init(self, *args, **kwargs):
         print(f"Initializing Credential Request: {self.init_uuid}")
 
+        self._s = httpx.Client()
+
         # Retrieve secret summary to get template and name
         sec_summ = self._getSecretSummary()
         self._sec_template = sec_summ["secretTemplateId"]
@@ -217,6 +219,8 @@ class SSCreds(BaseModel):
     ) -> httpx.Response:
 
         def sendRequest():
+            if self._s is None:
+                self._initSession()
             resp = self._s.get(  # pyright: ignore[reportOptionalMemberAccess]
                 headers=self._getHeaders,
                 url=SSAPP_BASEURL + url,  # pyright: ignore[reportOptionalOperand]
